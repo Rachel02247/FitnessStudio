@@ -1,2 +1,1 @@
-# FitnessStudio
-NET CORE  PROJECT 2025
+"# FitnessStudioProject" 
