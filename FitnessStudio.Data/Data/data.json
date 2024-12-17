@@ -1,0 +1,202 @@
+﻿{
+  "GymnastEntities": [
+    {
+      "Id": 1,
+      "TZ": "123456789",
+      "FirstName": "Alice",
+      "LastName": "Smith",
+      "DateOfBirth": "1990-03-15T00:00:00",
+      "PhoneNumber": "5556667777",
+      "Email": "alice.smith@example.com",
+      "Address": {
+        "Street": "123 Main St",
+        "City": "Anytown",
+        "State": "CA",
+        "ZipCode": "12345"
+      },
+      "Course": "BALLET"
+    },
+    {
+      "Id": 2,
+      "TZ": "987654321",
+      "FirstName": "Bob",
+      "LastName": "Johnson",
+      "DateOfBirth": "1992-06-20T00:00:00",
+      "PhoneNumber": "8889990000",
+      "Email": "bob.johnson@example.com",
+      "Address": {
+        "Street": "456 Elm St",
+        "City": "Sometown",
+        "State": "NY",
+        "ZipCode": "54321"
+      },
+      "Course": "FLOOR"
+    },
+    {
+      "Id": 3,
+      "TZ": "246813579",
+      "FirstName": "Charlie",
+      "LastName": "Brown",
+      "DateOfBirth": "1988-12-10T00:00:00",
+      "PhoneNumber": "1112223333",
+      "Email": "charlie.brown@example.com",
+      "Address": {
+        "Street": "789 Oak St",
+        "City": "Othertown",
+        "State": "TX",
+        "ZipCode": "67890"
+      },
+      "Course": "AEROBICS"
+    }
+  ],
+  "TrainerEntities": [
+    {
+      "Id": 1,
+      "TZ": "111222333",
+      "FirstName": "David",
+      "LastName": "Wilson",
+      "DateOfBirth": "1985-05-25T00:00:00",
+      "PhoneNumber": "7778889999",
+      "Email": "david.wilson@example.com",
+      "Address": {
+        "Street": "987 Cedar St",
+        "City": "Newtown",
+        "State": "MA",
+        "ZipCode": "23456"
+      },
+      "Specialization": "Dance",
+      "Diploma": "Certified Trainer"
+    },
+    {
+      "Id": 2,
+      "TZ": "444555666",
+      "FirstName": "Emily",
+      "LastName": "Martinez",
+      "DateOfBirth": "1990-08-30T00:00:00",
+      "PhoneNumber": "3334445555",
+      "Email": "emily.martinez@example.com",
+      "Address": {
+        "Street": "456 Birch St",
+        "City": "Anyvillage",
+        "State": "OR",
+        "ZipCode": "34567"
+      },
+      "Specialization": "HipHop",
+      "Diploma": "Master Trainer"
+    },
+    {
+      "Id": 3,
+      "TZ": "777888999",
+      "FirstName": "Frank",
+      "LastName": "Garcia",
+      "DateOfBirth": "1983-11-18T00:00:00",
+      "PhoneNumber": "2223334444",
+      "Email": "frank.garcia@example.com",
+      "Address": {
+        "Street": "753 Walnut St",
+        "City": "Otherville",
+        "State": "NV",
+        "ZipCode": "45678"
+      },
+      "Specialization": "Zomba",
+      "Diploma": "Fitness Trainer"
+    }
+  ],
+  "CourseEntities": [
+    {
+      "Id": 1,
+      "Name": "BAYLLA",
+      "MeetingNumbers": 20,
+      "StartDate": "2022-09-15T00:00:00",
+      "EndDate": "2022-12-15T00:00:00",
+      "TrainerId": 1,
+      "PreferredRoom": "NIKE",
+      "Equipment": "Mats, Balls"
+    },
+    {
+      "Id": 2,
+      "Name": "HIPHOP",
+      "MeetingNumbers": 15,
+      "StartDate": "2022-10-10T00:00:00",
+      "EndDate": "2023-01-10T00:00:00",
+      "TrainerId": 2,
+      "PreferredRoom": "ADIDAS",
+      "Equipment": "Stereo System"
+    },
+    {
+      "Id": 3,
+      "Name": "DANCE",
+      "MeetingNumbers": 18,
+      "StartDate": "2022-11-05T00:00:00",
+      "EndDate": "2023-02-05T00:00:00",
+      "TrainerId": 3,
+      "PreferredRoom": "PUMA",
+      "Equipment": "Dance Floor"
+    }
+  ],
+  "RoomEntities": [
+    {
+      "Id": 1,
+      "Room": "JARDEN",
+      "Floor": 1,
+      "IsActive": true,
+      "Code": "JRDN001",
+      "Suitable": "BALLET",
+      "MaxGymnasts": 20,
+      "Remark": "Spacious room with mirrors"
+    },
+    {
+      "Id": 2,
+      "Room": "RIBOCK",
+      "Floor": 2,
+      "IsActive": true,
+      "Code": "RBCK002",
+      "Suitable": "FLOOR",
+      "MaxGymnasts": 15,
+      "Remark": "Wooden floor for gymnastics"
+    },
+    {
+      "Id": 3,
+      "Room": "ALO",
+      "Floor": 1,
+      "IsActive": true,
+      "Code": "ALO001",
+      "Suitable": "AEROBICS",
+      "MaxGymnasts": 25,
+      "Remark": "Equipped with aerobic steps"
+    }
+  ],
+  "LessonEntities": [
+    {
+      "Id": 1,
+      "CourseId": 1,
+      "RoomId": 1,
+      "Date": "2022-09-20T00:00:00",
+      "Day": "Monday",
+      "StartTime": "10:00",
+      "EndTime": "11:30",
+      "ParticipantsAmount": 18
+    },
+    {
+      "Id": 2,
+      "CourseId": 2,
+      "RoomId": 2,
+      "Date": "2022-10-15T00:00:00",
+      "Day": "Saturday",
+      "StartTime": "14:00",
+      "EndTime": "15:30",
+      "ParticipantsAmount": 12
+    },
+    {
+      "Id": 3,
+      "CourseId": 3,
+      "RoomId": 3,
+      "Date": "2022-11-10T00:00:00",
+      "Day": "Thursday",
+      "StartTime": "18:00",
+      "EndTime": "19:30",
+      "ParticipantsAmount": 20
+    }
+  ]
+}
+
