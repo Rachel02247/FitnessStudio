@@ -8,16 +8,12 @@ using System.Threading.Tasks;
 namespace FitnessStudio.Core.Interfaces
 {
     //to id int
-    public interface IRepository<T>
+    public interface IService<T>
     {
-        List<T>? GetAllDB();
-        T? GetByIdDB(int id);
-        T? AddDB(T obj);
-        T? UpdateDB(int id, T obj);
-        bool DeleteDB(int id);
-      
-
-
-
+        List<T>? GetAll();
+        T? GetByID(int id);
+        T? AddItem(T item);
+        T? UpdateItem(int id, T item);
+        bool DeleteItem(int id);
     }
 }

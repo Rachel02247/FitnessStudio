@@ -1,6 +1,6 @@
 ﻿//using FitnessProject.Services;
 using FitnessProject.Entities;
-using FitnessStudio.Core.Interfaces.servcieInterface;
+using FitnessStudio.Core.Interfaces;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -14,55 +14,54 @@ namespace FitnessProject.Controllers
     public class TrainerController : ControllerBase
     {
         //private object result;
-        readonly ITrainerService _trainerService;
-        public TrainerController(ITrainerService trainerService)
+        readonly IService2<TrainerEntity> _trainerService;
+        public TrainerController(IService2<TrainerEntity> trainerService)
         {
             _trainerService = trainerService;
         }
         // GET: api/<TrainerController>
         [HttpGet]
-        public ActionResult<List<TrainerEntity>> Get()
+        public ActionResult<List<TrainerEntity>>? Get()
         {
             return _trainerService.GetAll();
         }
 
         // GET api/<TrainerController>/5
         [HttpGet("{id}")]
-        public ActionResult<TrainerEntity> GetById(int id)
+        public ActionResult<TrainerEntity> GetById(string id)
         {
-            if (id < 0)
+            if (id == null)
                 return BadRequest();
-            var trainer = _trainerService.GetByID(id);
-            if (trainer == null)
+            var Trainer = _trainerService.GetByID(id);
+            if (Trainer == null)
                 return NotFound();
-            return trainer;
+            return Trainer;
         }
         // POST api/<TrainerController>
         [HttpPost]
-        public ActionResult<bool> Post([FromBody] TrainerEntity value)
+        public ActionResult<TrainerEntity> Post([FromBody] TrainerEntity value)
         {
-            bool isSuccess = _trainerService.AddTrainer(value);
-            if (isSuccess)
+            TrainerEntity isSuccess = _trainerService.AddItem(value);
+            if (isSuccess != null)
                 return Ok(true);
             return BadRequest("ID exists in the system or the file do not found");
-
         }
 
         // PUT api/<TrainerController>/5
         [HttpPut("{id}")]
-        public ActionResult Put(int id, [FromBody] TrainerEntity value)
+        public ActionResult<TrainerEntity> Put(string id, [FromBody] TrainerEntity value)
         {
-            bool isSuccess = _trainerService.UpdateTrainer(id, value);
-            if (isSuccess)
+            TrainerEntity isSuccess = _trainerService.UpdateItem(id, value);
+            if (isSuccess != null)
                 return Ok(true);
             return NotFound();
         }
 
         // DELETE api/<TrainerController>/5
         [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        public ActionResult<bool> Delete(string id)
         {
-            bool isSuccess = _trainerService.DeleteTrainer(id);
+            bool isSuccess = _trainerService.DeleteItem(id);
             if (isSuccess)
                 return Ok(true);
             return NotFound();

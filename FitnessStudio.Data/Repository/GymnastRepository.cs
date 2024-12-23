@@ -1,5 +1,7 @@
 ﻿using FitnessProject.Entities;
 using FitnessStudio.Core.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace FitnessStudio.Data.Repository
 {
-    public class GymnastRepository : IRepository<GymnastEntity>
+    public class GymnastRepository : IRepository2<GymnastEntity>
     {
         readonly DataContext _dataContext;
         public GymnastRepository(DataContext dataContext)
@@ -17,81 +19,67 @@ namespace FitnessStudio.Data.Repository
         }
         public List<GymnastEntity> GetAllDB()
         {
-            return _dataContext.GymnastList.ToList();
+            return _dataContext.Gymnasts.ToList();
         }
-        public int FindIndexInDB(int id)
+        public GymnastEntity? GetByIdDB(string id)
         {
-            return GetAllDB().FindIndex(c => c.Id == id);
-        }
-        public GymnastEntity GetByIdDB(int id)
-        {
-            int index = FindIndexInDB(id);
-            if (_dataContext.GymnastList == null || index == -1)
-                return null;
-            return _dataContext.GymnastList.ToList()[index];
+            return _dataContext.Gymnasts.Find(id);
         }
 
-        public bool AddDB(GymnastEntity gymnast)
+        public GymnastEntity? AddDB(GymnastEntity gymnast)
         {
             try
             {
-                if(FindIndexInDB((int)gymnast.Id) != -1 || _dataContext.CourseList == null)
-                    return false;
-                //if (_dataContext == null)
-                //    _dataContext.GymnastList = new List<GymnastEntity>();
-                _dataContext.GymnastList.Add(gymnast);
-                _dataContext.SaveChanges();
-                return true;
+                _dataContext.Gymnasts.Add(gymnast);
+                return GetByIdDB(gymnast.TZ);
             }
             catch (Exception ex)
             {
-                return false;
+                return null;
             }
         }
-        public bool UpdateDB(int id, GymnastEntity gymnast)
+        public GymnastEntity? UpdateDB(string id, GymnastEntity gymnast)
         {
             try
             {
-                int index = FindIndexInDB((int)gymnast.Id);
-                if (_dataContext.GymnastList == null || index == -1)
-                    return false;
+                GymnastEntity curGymnast = GetByIdDB(id);
 
                 //**update all the fields**
-                //// _dataContext.GymnastList[index].Id = (uint)id;
-                if (_dataContext.GymnastList.ToList()[index].TZ != gymnast.TZ)
-                    _dataContext.GymnastList.ToList()[index].TZ = gymnast.TZ;
-                if (_dataContext.GymnastList.ToList()[index].FirstName != gymnast.FirstName)
-                    _dataContext.GymnastList.ToList()[index].FirstName = gymnast.TZ;
-                if (_dataContext.GymnastList.ToList()[index].LastName != gymnast.LastName)
-                    _dataContext.GymnastList.ToList()[index].LastName = gymnast.LastName;
-                if (_dataContext.GymnastList.ToList()[index].DateOfBirth != gymnast.DateOfBirth)
-                    _dataContext.GymnastList.ToList()[index].DateOfBirth = gymnast.DateOfBirth;
-                if (_dataContext.GymnastList.ToList()[index].PhoneNumber != gymnast.PhoneNumber)
-                    _dataContext.GymnastList.ToList()[index].PhoneNumber = gymnast.PhoneNumber;
-                if (_dataContext.GymnastList.ToList()[index].Email != gymnast.Email)
-                    _dataContext.GymnastList.ToList()[index].Email = gymnast.Email;
-                if (_dataContext.GymnastList.ToList()[index].IdAddress != gymnast.IdAddress)
-                    _dataContext.GymnastList.ToList()[index].IdAddress = gymnast.IdAddress;
-                //  if (_dataContext.GymnastList[index].Address != gymnast.Address)
-                //      _dataContext.GymnastList[index].Address = gymnast.Address;
-                if (_dataContext.GymnastList.ToList()[index].IdCourse != gymnast.IdCourse)
-                    _dataContext.GymnastList.ToList()[index].IdCourse = gymnast.IdCourse;
-             
-                return true;
+                if (gymnast.TZ != curGymnast.TZ)
+                 curGymnast.TZ = gymnast.TZ;
+
+                if (!gymnast.FirstName.IsNullOrEmpty())
+                 curGymnast.FirstName = gymnast.FirstName;
+
+                //nullable
+                if (curGymnast.LastName != gymnast.LastName)
+                 curGymnast.LastName = gymnast.LastName;
+
+                if (gymnast.DateOfBirth != null && DateTime.Compare((DateTime)gymnast.DateOfBirth, DateTime.Now) != 0)
+                 curGymnast.DateOfBirth = gymnast.DateOfBirth;
+
+                if (curGymnast.PhoneNumber != gymnast.PhoneNumber)
+                 curGymnast.PhoneNumber = gymnast.PhoneNumber;
+
+                if (curGymnast.Email != gymnast.Email)
+                 curGymnast.Email = gymnast.Email;
+
+                //only if exist in the address db
+                if (gymnast.IdAddress != curGymnast.IdAddress && _dataContext.Addresses.Find(gymnast.IdAddress) != null)
+                 curGymnast.IdAddress = gymnast.IdAddress;
+                
+               return curGymnast;
             }
             catch (Exception ex)
             {
-                return false;
+                return null;
             }
         }
-        public bool DeleteDB(int id)
+        public bool DeleteDB(string id)
         {
             try
-            {            
-                int index = FindIndexInDB(id);
-                if (_dataContext.GymnastList == null || index == -1 )
-                return false;
-                _dataContext.GymnastList.Remove(_dataContext.GymnastList.ToList()[index]);
+            {
+                _dataContext.Gymnasts.Remove(GetByIdDB(id));
                 return true;
             }
 

@@ -1,38 +1,56 @@
 ﻿using FitnessProject.Entities;
+using System.Linq.Expressions;
+using FitnessStudio.Service;
 using FitnessStudio.Core.Interfaces;
-using FitnessStudio.Core.Interfaces.servcieInterface;
+
+
 namespace FitnessProject.Services
 {
-    public class LessonService : ILessonService
+    public class LessonService : IService<LessonEntity>
     {
         readonly IRepository<LessonEntity> _lessonService;
+        readonly IRepositoryManager _repositoryManager;
 
-        public LessonService(IRepository<LessonEntity> lessonService)
+        public LessonService(IRepository<LessonEntity> lessonService, IRepositoryManager repositoryManager)
         {
             _lessonService = lessonService;
+            _repositoryManager = repositoryManager;
         }
         public List<LessonEntity>? GetAll()
         {
             return _lessonService.GetAllDB();
         }
-        public LessonEntity GetByID(int id)
+        public LessonEntity? GetByID(int id)
         {
             return _lessonService.GetByIdDB(id);
         }
-        public bool AddLesson(LessonEntity Lessondb)
+        public LessonEntity? AddItem(LessonEntity lessonItem)
         {
-            return _lessonService.AddDB(Lessondb);
+            LessonEntity lesson = _lessonService.GetByIdDB((int)lessonItem.Id);
+            if (lesson != null)
+                return null;
+            _lessonService.AddDB(lessonItem);
+            _repositoryManager.Save();
+            return _lessonService.GetByIdDB((int)lessonItem.Id);
         }
 
-        public bool UpdateLesson(int id, LessonEntity lessondb)
+        public LessonEntity? UpdateItem(int id, LessonEntity lessonItem)
         {
-            return _lessonService.UpdateDB(id, lessondb);
+            LessonEntity lesson = _lessonService.GetByIdDB((int)lessonItem.LessonId);
+            if (lesson == null)
+                return null;
+            _lessonService.UpdateDB(id, lessonItem);
+            _repositoryManager.Save();
+            return _lessonService.GetByIdDB((int)lessonItem.LessonId);
         }
-        public bool DeleteLesson(int id)
+        public bool DeleteItem(int id)
         {
-            if (id < 0)
+            LessonEntity lesson = _lessonService.GetByIdDB(id);
+            if (lesson == null)
                 return false;
-            return _lessonService.DeleteDB(id);
+            _lessonService.DeleteDB(id);
+            _repositoryManager.Save();
+            return true;
         }
     }
 }

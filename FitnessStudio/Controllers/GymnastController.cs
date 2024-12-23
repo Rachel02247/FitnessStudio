@@ -1,6 +1,6 @@
 ﻿//using FitnessProject.Services;
 using FitnessProject.Entities;
-using FitnessStudio.Core.Interfaces.servcieInterface;
+using FitnessStudio.Core.Interfaces;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -12,57 +12,56 @@ namespace FitnessProject.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class GymnastController : ControllerBase
-    {        
+    {
         //private object result;
-        readonly IGymnastService _gymnastService;
-        public GymnastController(IGymnastService gymnastService)
+        readonly IService2<GymnastEntity> _gymnastService;
+        public GymnastController(IService2<GymnastEntity> gymnastService)
         {
             _gymnastService = gymnastService;
         }
         // GET: api/<GymnastController>
         [HttpGet]
-        public ActionResult<List<GymnastEntity>> Get()
+        public ActionResult<List<GymnastEntity>>? Get()
         {
-           return _gymnastService.GetAll();
+            return _gymnastService.GetAll();
         }
 
         // GET api/<GymnastController>/5
         [HttpGet("{id}")]
-        public ActionResult<GymnastEntity> GetById(int id)
+        public ActionResult<GymnastEntity> GetById(string id)
         {
-            if (id < 0)
+            if (id == null)
                 return BadRequest();
-            var gymnast = _gymnastService.GetByID(id);
-            if(gymnast == null)
+            var Gymnast = _gymnastService.GetByID(id);
+            if (Gymnast == null)
                 return NotFound();
-            return gymnast;
+            return Gymnast;
         }
         // POST api/<GymnastController>
         [HttpPost]
-        public ActionResult<bool> Post([FromBody] GymnastEntity value)
+        public ActionResult<GymnastEntity> Post([FromBody] GymnastEntity value)
         {
-            bool isSuccess = _gymnastService.AddGymnast(value);
-            if (isSuccess)
+            GymnastEntity isSuccess = _gymnastService.AddItem(value);
+            if (isSuccess != null)
                 return Ok(true);
             return BadRequest("ID exists in the system or the file do not found");
-            
         }
 
         // PUT api/<GymnastController>/5
         [HttpPut("{id}")]
-        public ActionResult Put(int id, [FromBody] GymnastEntity value)
+        public ActionResult<GymnastEntity> Put(string id, [FromBody] GymnastEntity value)
         {
-            bool isSuccess = _gymnastService.UpdateGymnast(id, value);
-            if (isSuccess)
+            GymnastEntity isSuccess = _gymnastService.UpdateItem(id, value);
+            if (isSuccess != null)
                 return Ok(true);
             return NotFound();
         }
 
         // DELETE api/<GymnastController>/5
         [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        public ActionResult<bool> Delete(string id)
         {
-            bool isSuccess = _gymnastService.DeleteGymnast(id);
+            bool isSuccess = _gymnastService.DeleteItem(id);
             if (isSuccess)
                 return Ok(true);
             return NotFound();

@@ -1,6 +1,6 @@
 ﻿//using FitnessProject.Services;
 using FitnessProject.Entities;
-using FitnessStudio.Core.Interfaces.servcieInterface;
+using FitnessStudio.Core.Interfaces;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -14,55 +14,54 @@ namespace FitnessProject.Controllers
     public class RoomController : ControllerBase
     {
         //private object result;
-        readonly IRoomService _roomService;
-        public RoomController(IRoomService roomService)
+        readonly IService2<RoomEntity> _roomService;
+        public RoomController(IService2<RoomEntity> roomService)
         {
             _roomService = roomService;
         }
         // GET: api/<RoomController>
         [HttpGet]
-        public ActionResult<List<RoomEntity>> Get()
+        public ActionResult<List<RoomEntity>>? Get()
         {
             return _roomService.GetAll();
         }
 
         // GET api/<RoomController>/5
         [HttpGet("{id}")]
-        public ActionResult<RoomEntity> GetById(int id)
+        public ActionResult<RoomEntity> GetById(string id)
         {
-            if (id < 0)
+            if (id == null)
                 return BadRequest();
-            var room = _roomService.GetByID(id);
-            if (room == null)
+            var Room = _roomService.GetByID(id);
+            if (Room == null)
                 return NotFound();
-            return room;
+            return Room;
         }
         // POST api/<RoomController>
         [HttpPost]
-        public ActionResult<bool> Post([FromBody] RoomEntity value)
+        public ActionResult<RoomEntity> Post([FromBody] RoomEntity value)
         {
-            bool isSuccess = _roomService.AddRoom(value);
-            if (isSuccess)
+            RoomEntity isSuccess = _roomService.AddItem(value);
+            if (isSuccess != null)
                 return Ok(true);
             return BadRequest("ID exists in the system or the file do not found");
-
         }
 
         // PUT api/<RoomController>/5
         [HttpPut("{id}")]
-        public ActionResult Put(int id, [FromBody] RoomEntity value)
+        public ActionResult<RoomEntity> Put(string id, [FromBody] RoomEntity value)
         {
-            bool isSuccess = _roomService.UpdateRoom(id, value);
-            if (isSuccess)
+            RoomEntity isSuccess = _roomService.UpdateItem(id, value);
+            if (isSuccess != null)
                 return Ok(true);
             return NotFound();
         }
 
         // DELETE api/<RoomController>/5
         [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        public ActionResult<bool> Delete(string id)
         {
-            bool isSuccess = _roomService.DeleteRoom(id);
+            bool isSuccess = _roomService.DeleteItem(id);
             if (isSuccess)
                 return Ok(true);
             return NotFound();

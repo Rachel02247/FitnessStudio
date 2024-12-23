@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FitnessProject.Entities
 {
@@ -6,29 +7,21 @@ namespace FitnessProject.Entities
     {
         [Key]
         public uint Id { get; set; }
-        public int  CourseId  { get; set; }
-        public int RoomId { get; set; }
-        public DateTime Date { get; set; }
-        public string Day { get; set; }
-        public TimeOnly StartTime { get; set; }
-        public TimeOnly EndTime { get; set; }
-        public int ParticipantsAmount { get; set; }
+        [Required] 
+        public uint LessonId { get; set; }
+        public uint  CourseId  { get; set; }
+        [ForeignKey(nameof(CourseId))]
+        public CourseEntity Course { get; set; }
 
-        public LessonEntity()
-        {
+        public uint  RoomId  { get; set; }
+        [ForeignKey(nameof(RoomId))]
+        public RoomEntity Room { get; set; }
 
-        }
-        public LessonEntity(uint id,int courseId, int roomId, DateTime date, string day,
-            TimeOnly startTime, TimeOnly endTime, int participantsAmount)
-        {
-            Id = id;
-            CourseId = courseId;
-            RoomId = roomId;
-            Date = date;
-            Day = day;
-            StartTime = startTime;
-            EndTime = endTime;
-            ParticipantsAmount = participantsAmount;
-        }
+        public DateTime? Date { get; set; }
+        public int? Day { get; set; }
+        public DateTime? StartTime { get; set; }
+        public DateTime? EndTime { get; set; }
+        public uint? ParticipantsAmount { get; set; }
+
     }
 }

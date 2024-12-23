@@ -1,5 +1,7 @@
 ﻿using FitnessProject.Entities;
 using FitnessStudio.Core.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace FitnessStudio.Data.Repository
 {
-    public class TrainerRepository : IRepository<TrainerEntity>
+    public class TrainerRepository : IRepository2<TrainerEntity>
     {
         readonly DataContext _dataContext;
         public TrainerRepository(DataContext dataContext)
@@ -17,83 +19,73 @@ namespace FitnessStudio.Data.Repository
         }
         public List<TrainerEntity> GetAllDB()
         {
-            return _dataContext.TrainerList.ToList();
+            return _dataContext.Trainers.ToList();
         }
-        public int FindIndexInDB(int id)
+        public TrainerEntity? GetByIdDB(string id)
         {
-            return GetAllDB().FindIndex(c => c.Id == id);
-        }
-        public TrainerEntity GetByIdDB(int id)
-        {
-            int index = FindIndexInDB(id);
-            if (_dataContext.TrainerList == null || index == -1)
-                return null;
-            return _dataContext.TrainerList.ToList()[index];
+            return _dataContext.Trainers.Find(id);
         }
 
-        public bool AddDB(TrainerEntity trainer)
+        public TrainerEntity? AddDB(TrainerEntity trainer)
         {
             try
             {
-                if (FindIndexInDB((int)trainer.Id) != -1 || _dataContext.TrainerList == null)
-                    return false;
-                //if (_dataContext == null)
-                //    _dataContext.TrainerList = new List<TrainerEntity>();
-                _dataContext.TrainerList.Add(trainer);
-                _dataContext.SaveChanges();
-                return true;
+                _dataContext.Trainers.Add(trainer);
+                return GetByIdDB(trainer.TZ);
             }
             catch (Exception ex)
             {
-                return false;
+                return null;
             }
         }
-        public bool UpdateDB(int id, TrainerEntity trainer)
+        public TrainerEntity? UpdateDB(string id, TrainerEntity trainer)
         {
             try
             {
-                int index = FindIndexInDB((int)trainer.Id);
-                if (_dataContext.TrainerList == null || index == -1)
-                    return false;
+                TrainerEntity curTrainer = GetByIdDB(id);
 
                 //**update all the fields**
-                //// _dataContext.TrainerList[index].Id = (uint)id;
-                if (_dataContext.TrainerList.ToList()[index].TZ != trainer.TZ)
-                    _dataContext.TrainerList.ToList()[index].TZ = trainer.TZ;
-                if (_dataContext.TrainerList.ToList()[index].FirstName != trainer.FirstName)
-                    _dataContext.TrainerList.ToList()[index].FirstName = trainer.TZ;
-                if (_dataContext.TrainerList.ToList()[index].LastName != trainer.LastName)
-                    _dataContext.TrainerList.ToList()[index].LastName = trainer.LastName;
-                if (_dataContext.TrainerList.ToList()[index].DateOfBirth != trainer.DateOfBirth)
-                    _dataContext.TrainerList.ToList()[index].DateOfBirth = trainer.DateOfBirth;
-                if (_dataContext.TrainerList.ToList()[index].PhoneNumber != trainer.PhoneNumber)
-                    _dataContext.TrainerList.ToList()[index].PhoneNumber = trainer.PhoneNumber;
-                if (_dataContext.TrainerList.ToList()[index].Email != trainer.Email)
-                    _dataContext.TrainerList.ToList()[index].Email = trainer.Email;
-                if (_dataContext.TrainerList.ToList()[index].IdAddress != trainer.IdAddress)
-                    _dataContext.TrainerList.ToList()[index].IdAddress = trainer.IdAddress;
-                //if (_dataContext.TrainerList[index].Address != trainer.Address)
-                //    _dataContext.TrainerList[index].Address = trainer.Address;
-                if (_dataContext.TrainerList.ToList()[index].Specialization != trainer.Specialization)
-                    _dataContext.TrainerList.ToList()[index].Specialization = trainer.Specialization;
-                if (_dataContext.TrainerList.ToList()[index].Diploma != trainer.Diploma)
-                    _dataContext.TrainerList.ToList()[index].Diploma = trainer.Diploma;
+                if (trainer.TZ != curTrainer.TZ)
+                    curTrainer.TZ = trainer.TZ;
 
-                return true;
+                if (!trainer.FirstName.IsNullOrEmpty())
+                    curTrainer.FirstName = trainer.FirstName;
+
+                //nullable
+                if (curTrainer.LastName != trainer.LastName)
+                    curTrainer.LastName = trainer.LastName;
+
+                if (trainer.DateOfBirth != null && DateTime.Compare((DateTime)trainer.DateOfBirth, DateTime.Now) != 0)
+                    curTrainer.DateOfBirth = trainer.DateOfBirth;
+
+                if (curTrainer.PhoneNumber != trainer.PhoneNumber)
+                    curTrainer.PhoneNumber = trainer.PhoneNumber;
+
+                if (curTrainer.Email != trainer.Email)
+                    curTrainer.Email = trainer.Email;
+
+                //only if exist in the address db
+                if (trainer.IdAddress != curTrainer.IdAddress && _dataContext.Addresses.Find(trainer.IdAddress) != null)
+                    curTrainer.IdAddress = trainer.IdAddress;
+
+                if (!trainer.Specialization.IsNullOrEmpty())
+                    curTrainer.Specialization = trainer.Specialization;
+
+                if (curTrainer.Diploma != trainer.Diploma)
+                    curTrainer.Diploma = trainer.Diploma;
+
+                return curTrainer;
             }
             catch (Exception ex)
             {
-                return false;
+                return null;
             }
         }
-        public bool DeleteDB(int id)
+        public bool DeleteDB(string id)
         {
             try
             {
-                int index = FindIndexInDB(id);
-                if (_dataContext.TrainerList == null || index == -1)
-                    return false;
-                _dataContext.TrainerList.Remove(_dataContext.TrainerList.ToList()[index]);
+                _dataContext.Trainers.Remove(GetByIdDB(id));
                 return true;
             }
 

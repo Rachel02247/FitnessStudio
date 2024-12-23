@@ -1,44 +1,62 @@
 ﻿using FitnessProject.Entities;
-using FitnessStudio.Core.Interfaces;
+using System.Linq.Expressions;
 using FitnessStudio.Service;
-using FitnessStudio.Core.Interfaces.servcieInterface;
+using FitnessStudio.Core.Interfaces;
+
+
 namespace FitnessProject.Services
 {
-    public class TrainerService : ITrainerService
+    public class TrainerService : IService2<TrainerEntity>
     {
-        readonly IRepository<TrainerEntity> _trainerService;
+        readonly IRepository2<TrainerEntity> _trainerService;
+        readonly IRepositoryManager _repositoryManager;
 
-        public TrainerService(IRepository<TrainerEntity> trainerService)
+        public TrainerService(IRepository2<TrainerEntity> trainerService, IRepositoryManager repositoryManager)
         {
             _trainerService = trainerService;
+            _repositoryManager = repositoryManager;
         }
         public List<TrainerEntity>? GetAll()
         {
             return _trainerService.GetAllDB();
         }
-        public TrainerEntity GetByID(int id)
+        public TrainerEntity? GetByID(string id)
         {
             return _trainerService.GetByIdDB(id);
         }
-        public bool AddTrainer(TrainerEntity trainerdb)
+        public TrainerEntity? AddItem(TrainerEntity trainerItem)
         {
-            if (!ValidationCheck.IsValidID(trainerdb.TZ) || !ValidationCheck.IsValidEmail(trainerdb.Email))
-                return false;
-            return _trainerService.AddDB(trainerdb);
+            if (!ValidationCheck.IsValidID(trainerItem.TZ) || !ValidationCheck.IsValidEmail(trainerItem.Email))
+                return null;
+            TrainerEntity trainer = _trainerService.GetByIdDB(trainerItem.TZ);
+            if (trainer != null)
+                return null;
+            _trainerService.AddDB(trainerItem);
+            _repositoryManager.Save();
+            return _trainerService.GetByIdDB(trainerItem.TZ);
         }
 
-        public bool UpdateTrainer(int id, TrainerEntity trainerdb)
+        public TrainerEntity? UpdateItem(string id, TrainerEntity trainerItem)
         {
-            if (!ValidationCheck.IsValidID(trainerdb.TZ) || !ValidationCheck.IsValidEmail(trainerdb.Email))
-                return false;
-            return _trainerService.UpdateDB(id, trainerdb);
+            if (!ValidationCheck.IsValidID(trainerItem.TZ) || !ValidationCheck.IsValidEmail(trainerItem.Email))
+                return null;
+            TrainerEntity trainer = _trainerService.GetByIdDB(id);
+            if (trainer == null)
+                return null;
+            _trainerService.UpdateDB(id, trainerItem);
+            _repositoryManager.Save();
+            return _trainerService.GetByIdDB(id);
         }
-        public bool DeleteTrainer(int id)
+        public bool DeleteItem(string id)
         {
-            if (id < 0)
+            TrainerEntity trainer = _trainerService.GetByIdDB(id);
+            if (trainer == null)
                 return false;
-            return _trainerService.DeleteDB(id);
+            _trainerService.DeleteDB(id);
+            _repositoryManager.Save();
+            return true;
         }
+
 
     }
 }

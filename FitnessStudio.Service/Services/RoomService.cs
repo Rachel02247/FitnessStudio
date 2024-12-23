@@ -1,39 +1,58 @@
 ﻿using FitnessProject.Entities;
-using FitnessStudio.Core.Interfaces.servcieInterface;
+using System.Linq.Expressions;
+using FitnessStudio.Service;
 using FitnessStudio.Core.Interfaces;
+
 
 namespace FitnessProject.Services
 {
-    public class RoomService : IRoomService
+    public class RoomService : IService2<RoomEntity>
     {
-        readonly IRepository<RoomEntity> _roomService;
+        readonly IRepository2<RoomEntity> _roomService;
+        readonly IRepositoryManager _repositoryManager;
 
-        public RoomService(IRepository<RoomEntity> roomService)
+        public RoomService(IRepository2<RoomEntity> roomService, IRepositoryManager repositoryManager)
         {
             _roomService = roomService;
+            _repositoryManager = repositoryManager;
         }
         public List<RoomEntity>? GetAll()
         {
             return _roomService.GetAllDB();
         }
-        public RoomEntity GetByID(int id)
+        public RoomEntity GetByID(string id)
         {
             return _roomService.GetByIdDB(id);
         }
-        public bool AddRoom(RoomEntity Roomdb)
+        public RoomEntity? AddItem(RoomEntity roomItem)
         {
-            return _roomService.AddDB(Roomdb);
+            RoomEntity room = _roomService.GetByIdDB(roomItem.Code);
+            if (room != null)
+                return null;
+            _roomService.AddDB(roomItem);
+            _repositoryManager.Save();
+            return _roomService.GetByIdDB(roomItem.Code);
         }
 
-        public bool UpdateRoom(int id, RoomEntity roomdb)
+        public RoomEntity? UpdateItem(string id, RoomEntity roomItem)
         {
-            return _roomService.UpdateDB(id, roomdb);
+            RoomEntity room = _roomService.GetByIdDB(id);
+            if (room == null)
+                return null;
+            _roomService.UpdateDB(id, roomItem);
+            _repositoryManager.Save();
+            return _roomService.GetByIdDB(id);
         }
-        public bool DeleteRoom(int id)
+        public bool DeleteItem(string id)
         {
-            if (id < 0)
+            RoomEntity room = _roomService.GetByIdDB(id);
+            if (room == null)
                 return false;
-            return _roomService.DeleteDB(id);
+            _roomService.DeleteDB(id);
+            _repositoryManager.Save();
+            return true;
         }
+
+
     }
 }

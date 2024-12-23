@@ -1,6 +1,6 @@
 ﻿//using FitnessProject.Services;
 using FitnessProject.Entities;
-using FitnessStudio.Core.Interfaces.servcieInterface;
+using FitnessStudio.Core.Interfaces;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -14,14 +14,14 @@ namespace FitnessProject.Controllers
     public class LessonController : ControllerBase
     {
         //private object result;
-        readonly ILessonService _lessonService;
-        public LessonController(ILessonService lessonService)
+        readonly IService<LessonEntity> _lessonService;
+        public LessonController(IService<LessonEntity> lessonService)
         {
             _lessonService = lessonService;
         }
         // GET: api/<LessonController>
         [HttpGet]
-        public ActionResult<List<LessonEntity>> Get()
+        public ActionResult<List<LessonEntity>>? Get()
         {
             return _lessonService.GetAll();
         }
@@ -32,37 +32,36 @@ namespace FitnessProject.Controllers
         {
             if (id < 0)
                 return BadRequest();
-            var lesson = _lessonService.GetByID(id);
-            if (lesson == null)
+            var Lesson = _lessonService.GetByID(id);
+            if (Lesson == null)
                 return NotFound();
-            return lesson;
+            return Lesson;
         }
         // POST api/<LessonController>
         [HttpPost]
-        public ActionResult<bool> Post([FromBody] LessonEntity value)
+        public ActionResult<LessonEntity> Post([FromBody] LessonEntity value)
         {
-            bool isSuccess = _lessonService.AddLesson(value);
-            if (isSuccess)
+            LessonEntity isSuccess = _lessonService.AddItem(value);
+            if (isSuccess != null)
                 return Ok(true);
             return BadRequest("ID exists in the system or the file do not found");
-
         }
 
         // PUT api/<LessonController>/5
         [HttpPut("{id}")]
-        public ActionResult Put(int id, [FromBody] LessonEntity value)
+        public ActionResult<LessonEntity> Put(int id, [FromBody] LessonEntity value)
         {
-            bool isSuccess = _lessonService.UpdateLesson(id, value);
-            if (isSuccess)
+            LessonEntity isSuccess = _lessonService.UpdateItem(id, value);
+            if (isSuccess != null)
                 return Ok(true);
             return NotFound();
         }
 
         // DELETE api/<LessonController>/5
         [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        public ActionResult<bool> Delete(int id)
         {
-            bool isSuccess = _lessonService.DeleteLesson(id);
+            bool isSuccess = _lessonService.DeleteItem(id);
             if (isSuccess)
                 return Ok(true);
             return NotFound();

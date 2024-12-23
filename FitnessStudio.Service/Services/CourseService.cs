@@ -2,18 +2,19 @@
 using System.Linq.Expressions;
 using FitnessStudio.Service;
 using FitnessStudio.Core.Interfaces;
-using FitnessStudio.Core.Interfaces.servcieInterface;
 
 
 namespace FitnessProject.Services
 {
-    public class CourseService : ICourseService
+    public class CourseService : IService<CourseEntity>
     {
         readonly IRepository<CourseEntity> _courseService;
+        readonly IRepositoryManager _repositoryManager;
 
-        public CourseService(IRepository<CourseEntity> courseService)
+        public CourseService(IRepository<CourseEntity> courseService, IRepositoryManager repositoryManager)
         {
             _courseService = courseService;
+            _repositoryManager = repositoryManager;
         }
         public List<CourseEntity>? GetAll()
         {
@@ -23,21 +24,33 @@ namespace FitnessProject.Services
         {
             return _courseService.GetByIdDB(id);
         }
-        public bool AddCourse(CourseEntity Coursedb)
+        public CourseEntity? AddItem(CourseEntity courseItem)
         {
-            return _courseService.AddDB(Coursedb);
+            CourseEntity course = _courseService.GetByIdDB((int)courseItem.Id);
+            if (course != null)
+                return null;
+            _courseService.AddDB(courseItem);
+            _repositoryManager.Save();
+            return _courseService.GetByIdDB((int)courseItem.Id);
         }
 
-        public bool UpdateCourse(int id, CourseEntity coursedb)
+        public CourseEntity? UpdateItem(int id, CourseEntity courseItem)
         {
-            return _courseService.UpdateDB(id, coursedb);
+            CourseEntity course = _courseService.GetByIdDB((int)courseItem.courseId);
+            if (course == null)
+                return null;
+            _courseService.UpdateDB(id, courseItem);
+            _repositoryManager.Save();
+            return _courseService.GetByIdDB((int)courseItem.courseId);
         }
-        public bool DeleteCourse(int id)
+        public bool DeleteItem(int id)
         {
-            if (id < 0)
+            CourseEntity course = _courseService.GetByIdDB(id);
+            if (course == null)
                 return false;
-            return _courseService.DeleteDB(id);
+            _courseService.DeleteDB(id);
+            _repositoryManager.Save();
+            return true;
         }
-
     }
 }

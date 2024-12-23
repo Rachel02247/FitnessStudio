@@ -1,5 +1,7 @@
 ﻿using FitnessProject.Entities;
 using FitnessStudio.Core.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace FitnessStudio.Data.Repository
 {
-    public class RoomRepository : IRepository<RoomEntity>
+    public class RoomRepository : IRepository2<RoomEntity>
     {
         readonly DataContext _dataContext;
         public RoomRepository(DataContext dataContext)
@@ -17,75 +19,63 @@ namespace FitnessStudio.Data.Repository
         }
         public List<RoomEntity> GetAllDB()
         {
-            return _dataContext.RoomList.ToList();
+            return _dataContext.Rooms.ToList();
         }
-        public int FindIndexInDB(int id)
+        public RoomEntity? GetByIdDB(string id)
         {
-            return GetAllDB().FindIndex(c => c.Id == id);
-        }
-        public RoomEntity GetByIdDB(int id)
-        {
-            int index = FindIndexInDB(id);
-            if (_dataContext.RoomList == null || index == -1)
-                return null;
-            return _dataContext.RoomList.ToList()[index];
+            return _dataContext.Rooms.Find(id);
         }
 
-        public bool AddDB(RoomEntity room)
+        public RoomEntity? AddDB(RoomEntity room)
         {
             try
             {
-                if (FindIndexInDB((int)room.Id) != -1 || _dataContext.RoomList == null)
-                    return false;
-                //if (_dataContext == null)
-                //    _dataContext.RoomList = new List<RoomEntity>();
-                _dataContext.RoomList.Add(room);
-                _dataContext.SaveChanges();
-                return true;
+                _dataContext.Rooms.Add(room);
+                return GetByIdDB(room.Code);
             }
             catch (Exception ex)
             {
-                return false;
+                return null;
             }
         }
-        public bool UpdateDB(int id, RoomEntity room)
+        public RoomEntity? UpdateDB(string id, RoomEntity room)
         {
             try
             {
-                int index = FindIndexInDB((int)room.Id);
-                if (_dataContext.RoomList == null || index == -1)
-                    return false;
+                RoomEntity curRoom = GetByIdDB(id);
 
                 //**update all the fields**
-                _dataContext.RoomList.ToList()[index].Id = (uint)id;
-                if (_dataContext.RoomList.ToList()[index].RoomName != room.RoomName)
-                    _dataContext.RoomList.ToList()[index].RoomName = room.RoomName;
-                if (_dataContext.RoomList.ToList()[index].Floor != room.Floor)
-                    _dataContext.RoomList.ToList()[index].IsActive = room.IsActive;
-                if (_dataContext.RoomList.ToList()[index].IsActive != room.IsActive)
-                    _dataContext.RoomList.ToList()[index].Code = room.Code;
-                if (_dataContext.RoomList.ToList()[index].SuitableCourse != room.SuitableCourse)
-                    _dataContext.RoomList.ToList()[index].SuitableCourse = room.SuitableCourse;
-                if (_dataContext.RoomList.ToList()[index].MaxGymnasts != room.MaxGymnasts)
-                    _dataContext.RoomList.ToList()[index].MaxGymnasts = room.MaxGymnasts;
-                if (_dataContext.RoomList.ToList()[index].Remark != room.Remark)
-                    _dataContext.RoomList.ToList()[index].Remark = room.Remark;
+                if (!room.RoomName.IsNullOrEmpty())
+                    curRoom.RoomName = room.RoomName;
 
-                return true;
+                //nullable
+                if (curRoom.Floor != room.Floor)
+                    curRoom.Floor = room.Floor;
+
+                if (curRoom.IsActive != room.IsActive)
+                    curRoom.IsActive = room.IsActive;
+
+                if (!room.Code.IsNullOrEmpty())
+                    curRoom.Code = room.Code;
+
+                if (curRoom.MaxGymnasts >= 0)
+                    curRoom.MaxGymnasts = room.MaxGymnasts;
+
+                if (curRoom.Remark != room.Remark)
+                    curRoom.Remark = room.Remark;
+
+                return curRoom;
             }
             catch (Exception ex)
             {
-                return false;
+                return null;
             }
         }
-        public bool DeleteDB(int id)
+        public bool DeleteDB(string id)
         {
             try
             {
-                int index = FindIndexInDB(id);
-                if (_dataContext.RoomList == null || index == -1)
-                    return false;
-                _dataContext.RoomList.Remove(_dataContext.RoomList.ToList()[index]);
+                _dataContext.Rooms.Remove(GetByIdDB(id));
                 return true;
             }
 

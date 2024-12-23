@@ -1,6 +1,6 @@
 ﻿//using FitnessProject.Services;
 using FitnessProject.Entities;
-using FitnessStudio.Core.Interfaces.servcieInterface;
+using FitnessStudio.Core.Interfaces;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -14,10 +14,10 @@ namespace FitnessProject.Controllers
     public class CourseController : ControllerBase
     {
         //private object result;
-        readonly ICourseService _courseService;
-        public CourseController(ICourseService CourseService)
+        readonly IService<CourseEntity> _courseService;
+        public CourseController(IService<CourseEntity> courseService)
         {
-            _courseService = CourseService;
+            _courseService = courseService;
         }
         // GET: api/<CourseController>
         [HttpGet]
@@ -39,30 +39,29 @@ namespace FitnessProject.Controllers
         }
         // POST api/<CourseController>
         [HttpPost]
-        public ActionResult<bool> Post([FromBody] CourseEntity value)
+        public ActionResult<CourseEntity> Post([FromBody] CourseEntity value)
         {
-            bool isSuccess = _courseService.AddCourse(value);
-            if (isSuccess)
+            CourseEntity isSuccess = _courseService.AddItem(value);
+            if (isSuccess != null)
                 return Ok(true);
             return BadRequest("ID exists in the system or the file do not found");
-
         }
 
         // PUT api/<CourseController>/5
         [HttpPut("{id}")]
-        public ActionResult Put(int id, [FromBody] CourseEntity value)
+        public ActionResult<CourseEntity> Put(int id, [FromBody] CourseEntity value)
         {
-            bool isSuccess = _courseService.UpdateCourse(id, value);
-            if (isSuccess)
+            CourseEntity isSuccess = _courseService.UpdateItem(id, value);
+            if (isSuccess != null)
                 return Ok(true);
             return NotFound();
         }
 
         // DELETE api/<CourseController>/5
         [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        public ActionResult<bool> Delete(int id)
         {
-            bool isSuccess = _courseService.DeleteCourse(id);
+            bool isSuccess = _courseService.DeleteItem(id);
             if (isSuccess)
                 return Ok(true);
             return NotFound();
